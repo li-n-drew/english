@@ -689,6 +689,90 @@
                 padding: 12px;
             }
         }
+
+        /* ===== IPA VIRTUAL KEYBOARD (compact, centered) ===== */
+        .ipa-keyboard {
+            display: none;
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            max-width: 94vw;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 6px 8px;
+            z-index: 1000;
+            box-shadow: 0 10px 30px -6px rgba(0,0,0,0.5);
+            font-family: 'Courier New', monospace;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .ipa-keyboard.visible {
+            display: block;
+        }
+        .ipa-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 34px);
+            gap: 4px;
+        }
+        .ipa-cat {
+            grid-column: 1 / -1;
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 2px;
+            padding-left: 2px;
+        }
+        .ipa-btn {
+            background: var(--card-border);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            padding: 0;
+            width: 34px;
+            height: 32px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            text-align: center;
+            line-height: 1;
+            transition: all 0.15s;
+        }
+        .ipa-btn:hover {
+            background: var(--accent-blue);
+            color: #0f172a;
+            transform: translateY(-1px);
+        }
+        .ipa-btn:active {
+            transform: translateY(0);
+        }
+        .ipa-btn.wide {
+            grid-column: span 2;
+        }
+        .ipa-btn.wide2 {
+            grid-column: span 3;
+        }
+        @media (max-width: 480px) {
+            .ipa-keyboard {
+                bottom: 8px;
+                padding: 5px 6px;
+                max-width: 98vw;
+            }
+            .ipa-grid {
+                grid-template-columns: repeat(6, 30px);
+                gap: 3px;
+            }
+            .ipa-btn {
+                width: 30px;
+                height: 28px;
+                font-size: 12px;
+            }
+            .ipa-btn.wide { grid-column: span 2; }
+            .ipa-btn.wide2 { grid-column: span 3; }
+        }
     </style>
 </head>
 <body>
@@ -740,6 +824,46 @@
             <div class="grid" id="vocab-grid"></div>
         </div>
     </main>
+
+    <!-- IPA VIRTUAL KEYBOARD FOR TRANSCRIPTION INPUTS -->
+    <div class="ipa-keyboard" id="ipa-keyboard">
+        <div class="ipa-grid">
+            <div class="ipa-cat">скобки</div>
+            <button class="ipa-btn" onclick="ipaInsert('[')">[</button>
+            <button class="ipa-btn" onclick="ipaInsert(']')">]</button>
+            <div class="ipa-cat">короткие гласные</div>
+            <button class="ipa-btn" onclick="ipaInsert('ə')">ə</button>
+            <button class="ipa-btn" onclick="ipaInsert('ɪ')">ɪ</button>
+            <button class="ipa-btn" onclick="ipaInsert('ʊ')">ʊ</button>
+            <button class="ipa-btn" onclick="ipaInsert('æ')">æ</button>
+            <button class="ipa-btn" onclick="ipaInsert('ɛ')">ɛ</button>
+            <button class="ipa-btn" onclick="ipaInsert('ɒ')">ɒ</button>
+            <div class="ipa-cat">длинные гласные</div>
+            <button class="ipa-btn" onclick="ipaInsert('iː')">iː</button>
+            <button class="ipa-btn" onclick="ipaInsert('uː')">uː</button>
+            <button class="ipa-btn" onclick="ipaInsert('ɑː')">ɑː</button>
+            <button class="ipa-btn" onclick="ipaInsert('ɔː')">ɔː</button>
+            <button class="ipa-btn" onclick="ipaInsert('ɜː')">ɜː</button>
+            <div class="ipa-cat">двоякие гласные</div>
+            <button class="ipa-btn" onclick="ipaInsert('eɪ')">eɪ</button>
+            <button class="ipa-btn" onclick="ipaInsert('aɪ')">aɪ</button>
+            <button class="ipa-btn" onclick="ipaInsert('ɔɪ')">ɔɪ</button>
+            <button class="ipa-btn" onclick="ipaInsert('aʊ')">aʊ</button>
+            <button class="ipa-btn" onclick="ipaInsert('əʊ')">əʊ</button>
+            <button class="ipa-btn" onclick="ipaInsert('ɪə')">ɪə</button>
+            <div class="ipa-cat">согласные</div>
+            <button class="ipa-btn" onclick="ipaInsert('ʃ')">ʃ</button>
+            <button class="ipa-btn" onclick="ipaInsert('tʃ')">tʃ</button>
+            <button class="ipa-btn" onclick="ipaInsert('θ')">θ</button>
+            <button class="ipa-btn" onclick="ipaInsert('ð')">ð</button>
+            <button class="ipa-btn" onclick="ipaInsert('ŋ')">ŋ</button>
+            <button class="ipa-btn" onclick="ipaInsert('ʒ')">ʒ</button>
+            <div class="ipa-cat">диакритика</div>
+            <button class="ipa-btn" onclick="ipaInsert('ˈ')">ˈ</button>
+            <button class="ipa-btn" onclick="ipaInsert('ˌ')">ˌ</button>
+            <button class="ipa-btn" onclick="ipaInsert('ː')">ː</button>
+        </div>
+    </div>
 
     <script>
         const CATEGORIES = [
@@ -2048,6 +2172,57 @@
 
             grid.innerHTML = filtered.map(vocabCard).join('');
         }
+
+        // ===== IPA VIRTUAL KEYBOARD =====
+        let ipaActiveInput = null;
+
+        function ipaInsert(text) {
+            if (!ipaActiveInput) return;
+            const start = ipaActiveInput.selectionStart;
+            const end = ipaActiveInput.selectionEnd;
+            ipaActiveInput.value = ipaActiveInput.value.slice(0, start) + text + ipaActiveInput.value.slice(end);
+            ipaActiveInput.selectionStart = ipaActiveInput.selectionEnd = start + text.length;
+            ipaActiveInput.focus();
+            ipaActiveInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        function ipaClear() {
+            if (!ipaActiveInput) return;
+            ipaActiveInput.value = '';
+            ipaActiveInput.focus();
+            ipaActiveInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        // Show IPA keyboard when a transcription input is focused
+        document.addEventListener('focusin', (e) => {
+            if (e.target.matches('input.ans[data-a*="["]')) {
+                ipaActiveInput = e.target;
+                const kb = document.getElementById('ipa-keyboard');
+                if (kb) kb.classList.add('visible');
+            } else if (!e.target.closest('#ipa-keyboard')) {
+                const kb = document.getElementById('ipa-keyboard');
+                if (kb) kb.classList.remove('visible');
+            }
+        });
+
+        // Keep IPA keyboard open while clicking its buttons; keep focus on the transcription input
+        const ipaKb = document.getElementById('ipa-keyboard');
+        if (ipaKb) {
+            ipaKb.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                if (ipaActiveInput) ipaActiveInput.focus();
+            });
+        }
+
+        // Hide IPA keyboard when clicking outside both the transcription input and the keyboard
+        document.addEventListener('mousedown', (e) => {
+            const kb = document.getElementById('ipa-keyboard');
+            if (!kb || !kb.classList.contains('visible')) return;
+            if (!e.target.matches('input.ans[data-a*="["]') && !kb.contains(e.target)) {
+                kb.classList.remove('visible');
+                ipaActiveInput = null;
+            }
+        });
 
         // INITIAL LOAD
         renderSidebar();
